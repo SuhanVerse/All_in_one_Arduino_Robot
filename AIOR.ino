@@ -183,13 +183,16 @@ int IRremote_command(uint32_t value) {
 // -------------------- Servo Helpers --------------------
 void sweepServo(int startAngle, int endAngle, int step) {
   if (step == 0) return;
+  // Direction comes from the endpoints; callers may pass either step sign.
+  long stepSize = step;
+  if (stepSize < 0) stepSize = -stepSize;
   if (startAngle < endAngle) {
-    for (int a = startAngle; a <= endAngle; a += step) {
+    for (long a = startAngle; a <= endAngle; a += stepSize) {
       scanServo.write(a);
       delay(20);
     }
   } else {
-    for (int a = startAngle; a >= endAngle; a -= step) {
+    for (long a = startAngle; a >= endAngle; a -= stepSize) {
       scanServo.write(a);
       delay(20);
     }
