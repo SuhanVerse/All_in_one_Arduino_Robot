@@ -101,8 +101,8 @@ This project is perfect for **students, hobbyists, and robotics enthusiasts** wh
 | **Backward (TouchDown)**            | `2`                       | `bt_ir_data == 2`          | Move Backward                |
 | **Left (TouchDown)**                | `3`                       | `bt_ir_data == 3`          | Turn Left                    |
 | **Right (TouchDown)**               | `4`                       | `bt_ir_data == 4`          | Turn Right                   |
-| **Stop / Button Release (TouchUp)** | `0`                       | `bt_ir_data == 0` → Stop   | Stop Motors                  |
-| **Stop Button (optional)**          | `5`                       | `bt_ir_data == 5`          | Stop Motors                  |
+| **Stop (manual mode only) / Button Release (TouchUp)** | `0`                       | `bt_ir_data == 0` → Stop (manual mode only)   | Stop (manual mode only) Motors                  |
+| **Stop (manual mode only) Button (optional)**          | `5`                       | `bt_ir_data == 5`          | Stop (manual mode only) Motors                  |
 | **Voice Left**                      | `6`                       | `bt_ir_data == 6`          | Short Left Turn (momentary)  |
 | **Voice Right**                     | `7`                       | `bt_ir_data == 7`          | Short Right Turn (momentary) |
 | **Manual Mode**                     | `8`                       | `mode = 0`                 | Switch to Manual Control     |
@@ -165,7 +165,7 @@ The IR button labels vary by remote. The firmware maps raw `0xFF30CF` to manual,
 ## Limitations before a moving test
 
 - The servo helper now normalizes the step sign. The descending `140 → 0` startup/scan calls previously increased the angle instead of completing.
-- Turns and scanning use blocking delays. A stop byte is processed when input polling resumes; there is no independent emergency-stop or lost-connection timeout.
+- Turns and scanning use blocking delays. Bytes `0`/`5` stop the motors only in manual mode. Autonomous modes ignore those stop bytes; send byte `8` to return to manual and stop once input polling resumes. There is no independent emergency-stop or lost-connection timeout.
 - A missing ultrasonic echo returns 400 cm. Obstacle mode treats that as clear space and can drive forward; it cannot distinguish a disconnected sensor from an out-of-range obstacle.
 - On a classic ATmega328P Uno, the [Servo library uses Timer1](https://github.com/arduino-libraries/Servo/blob/master/src/avr/ServoTimers.h), which [conflicts with PWM on D9/D10](https://github.com/arduino-libraries/Servo/blob/master/docs/api.md#detach). The right motor enable is D10. This requires a reviewed wiring/timer change before relying on independent motor speed control; this update does not change the pinout.
 - Selecting line-following or obstacle mode sets its default speed again while the mode-select command remains the last command. Slider behavior therefore needs a device check in each mode.
